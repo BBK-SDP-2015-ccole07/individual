@@ -1,0 +1,10 @@
+d0 lin 1 6
+d1 lin 2 3
+d2 lin 3 -2
+d3 lin 4 0
+d4 div 5 1 2
+d5 div 6 2 1
+d6 div 7 2 3
+d7 div 8 4 1
+d7 div 8 2 4
+d8 div 9 3 3
