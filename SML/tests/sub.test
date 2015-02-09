@@ -1,0 +1,8 @@
+s0 lin 1 6
+s1 lin 2 3
+s2 lin 3 1
+s3 lin 4 0
+s4 sub 5 1 2
+s5 sub 6 2 3
+s6 sub 7 4 5
+s7 sub 8 2 1
