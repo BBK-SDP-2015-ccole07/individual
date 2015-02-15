@@ -112,8 +112,6 @@ public class Translator {
 			return new OutInstruction(label, r);
 		}
 
-		// You will have to write code here for the other instructions.
-
 		return null;
 	}
 
