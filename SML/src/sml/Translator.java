@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /*
  * The translator of a <b>S</b><b>M</b>al<b>L</b> program.
@@ -73,48 +75,57 @@ public class Translator {
 	// removed. Translate line into an instruction with label label
 	// and return the instruction
 	public Instruction getInstruction(String label) {
-		int s1; // Possible operands of the instruction
-		int s2;
-		int r;
-		int x;
-		String j;
+		Class<?> c;				// the instruction class
+		Constructor[] con;		// an array of constructors for this class
+		Class<?>[] paramType;	// the parameter types for the constructor we want to invoke 
 
 		if (line.equals(""))
 			return null;
 
+		// get the instruction and use it to construct the class name
 		String ins = scan();
-		switch (ins) {
-		case "add":
-			r = scanInt();
-			s1 = scanInt();
-			s2 = scanInt();
-			return new AddInstruction(label, r, s1, s2);
-		case "sub":
-			r = scanInt();
-			s1 = scanInt();
-			s2 = scanInt();
-			return new SubInstruction(label, r, s1, s2);
-		case "mul":
-			r = scanInt();
-			s1 = scanInt();
-			s2 = scanInt();
-			return new MulInstruction(label, r, s1, s2);
-		case "div":
-			r = scanInt();
-			s1 = scanInt();
-			s2 = scanInt();
-			return new DivInstruction(label, r, s1, s2);
-		case "lin":
-			r = scanInt();
-			s1 = scanInt();
-			return new LinInstruction(label, r, s1);
-		case "bnz":
-			r = scanInt();
-			j = scan();
-			return new BnzInstruction(label, r, j);
-		case "out":
-			r = scanInt();
-			return new OutInstruction(label, r);
+		String className = "sml." + ins.substring(0, 1).toUpperCase() + ins.substring(1) + "Instruction";
+
+		try {
+			// get the class ...
+			c = Class.forName(className);
+			
+			// ... and then all of its constructors ...
+			con = c.getConstructors();
+			
+			// .. and then the parameter types expected by the constructor declared 2nd
+			// There's a slightly dodgy assumption here that any future instructions will
+			// have their constructor declared in the same order.
+			paramType = con[1].getParameterTypes();
+			
+			// Local var to hold the number of parameters this instruction is expecting
+			int numParams = paramType.length;
+			
+			// Local var to hold those parameters, which we'll now go get
+			Object[] param = new Object[paramType.length];
+			
+			// We already know have the first parameter, so we'll not waste time on that
+			param[0] = label;
+			
+			// For the rest we iterate through the expected list ...
+			// ... casting the inputs to int where appropriate 
+		    for (int i = 1; i < numParams; i++) {
+		    	if (paramType[i].equals(int.class)) param[i] = scanInt();
+		    	else param[i] = (String) scan();
+		    }
+
+		    // Finally we invoke that "2nd" constructor with the params that we've
+		    // carefully collated for it
+		    return (Instruction) con[1].newInstance(param);
+		
+		} catch (ClassNotFoundException |
+				 InstantiationException |
+				 IllegalAccessException |
+				 IllegalArgumentException |
+				 InvocationTargetException | 
+				 SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return null;
