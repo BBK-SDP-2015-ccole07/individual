@@ -4,3 +4,6 @@ a2 lin 3 1
 a3 add 4 1 2
 a4 add 5 2 3
 a5 add 6 4 5
+a6 out 4
+a7 out 5
+a8 out 6
