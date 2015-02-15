@@ -77,6 +77,7 @@ public class Translator {
 		int s2;
 		int r;
 		int x;
+		String j;
 
 		if (line.equals(""))
 			return null;
@@ -107,6 +108,10 @@ public class Translator {
 			r = scanInt();
 			s1 = scanInt();
 			return new LinInstruction(label, r, s1);
+		case "bnz":
+			r = scanInt();
+			j = scan();
+			return new BnzInstruction(label, r, j);
 		case "out":
 			r = scanInt();
 			return new OutInstruction(label, r);
