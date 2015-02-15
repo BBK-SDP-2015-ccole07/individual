@@ -27,6 +27,6 @@ public class OutInstruction extends Instruction {
 
 	@Override
 	public String toString() {
-		return super.toString() + " " + op;
+		return super.toString() + " register " + op;
 	}
 }
