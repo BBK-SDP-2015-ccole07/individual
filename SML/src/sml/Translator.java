@@ -71,9 +71,8 @@ public class Translator {
 		return true;
 	}
 
-	// line should consist of an MML instruction, with its label already
-	// removed. Translate line into an instruction with label label
-	// and return the instruction
+	// Each line consists of an MML instruction, with its label already removed.
+	// It is then translated an instruction with label label and the instruction is returned
 	public Instruction getInstruction(String label) {
 		Class<?> c;				// the instruction class
 		Constructor[] con;		// an array of constructors for this class
@@ -107,27 +106,38 @@ public class Translator {
 			// We already have the first parameter, so we'll not waste time on that
 			param[0] = label;
 			
-			// For the rest we iterate through the expected parameter list ...
-			// ... casting the inputs to int where appropriate 
+			// For the rest we iterate through the expected parameter list,
+			// casting the inputs to int where appropriate and trapping
+			// missing parameters
 		    for (int i = 1; i < numParams; i++) {
-		    	if (paramType[i].equals(int.class)) param[i] = scanInt();
-		    	else param[i] = (String) scan();
+		    	if (paramType[i].equals(int.class)) {
+		    		param[i] = scanInt();
+		    		if (param[i].equals(Integer.MAX_VALUE))
+		    			throw new IllegalArgumentException();
+		    	} else {
+		    		param[i] = (String) scan();
+		    		if (param[i].equals(""))
+		    			throw new IllegalArgumentException();
+		    	}
 		    }
 
+		    // Check that we don't have extra, unexpected parameters
+		    if (!scan().equals(""))
+		    	throw new IllegalArgumentException();
+		    
 		    // Finally we invoke that "2nd" constructor with the params that we've
 		    // carefully collated for it
 		    return (Instruction) con[1].newInstance(param);
 		
-		} catch (ClassNotFoundException |
-				 InstantiationException |
-				 IllegalAccessException |
-				 IllegalArgumentException |
-				 InvocationTargetException | 
-				 SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+		    error("Too few, too many or wrong parameter type", label);
+		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException e) {
+			error("Unable to carry out instruction", label);
+		} catch (IllegalAccessException | SecurityException e) {
+			error("Access or security violation", label);	
 		}
-
+		
+		// We only get this far if something has gone wrong
 		return null;
 	}
 
@@ -162,5 +172,9 @@ public class Translator {
 		} catch (NumberFormatException e) {
 			return Integer.MAX_VALUE;
 		}
+	}
+	
+	private void error(String msg, String label) {
+		System.out.println("Parse Error: " + msg + " on line " + label);
 	}
 }
