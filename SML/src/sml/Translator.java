@@ -104,10 +104,10 @@ public class Translator {
 			// Local var to hold those parameters, which we'll now go get
 			Object[] param = new Object[paramType.length];
 			
-			// We already know have the first parameter, so we'll not waste time on that
+			// We already have the first parameter, so we'll not waste time on that
 			param[0] = label;
 			
-			// For the rest we iterate through the expected list ...
+			// For the rest we iterate through the expected parameter list ...
 			// ... casting the inputs to int where appropriate 
 		    for (int i = 1; i < numParams; i++) {
 		    	if (paramType[i].equals(int.class)) param[i] = scanInt();
